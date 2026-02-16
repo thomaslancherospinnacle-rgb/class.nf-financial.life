@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 5 Quiz - Non-Forfeiture Financial</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon">NF</div>
+                <div class="logo-text">
+                    <h1>Non-Forfeiture Financial</h1>
+                    <p>Finance 101: Regulations and Codes</p>
+                </div>
+            </a>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-secondary" onclick="window.location.href='module5.html'">← Back to Module</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>›</span>
+            <a href="module5.html">Module 5</a>
+            <span>›</span>
+            <span>Quiz</span>
+        </div>
+
+        <div class="quiz-section">
+            <h2 style="margin-bottom: 16px;">📝 Module 5 Quiz</h2>
+            <p style="color: #5f6368; margin-bottom: 24px;">
+                Answer all 10 questions to test your knowledge. You must score 80% or higher to pass this module and earn credit.
+            </p>
+            
+            <div style="padding: 16px; background: #e8f5e9; border-radius: 8px; margin-bottom: 24px;">
+                <h4 style="margin-bottom: 8px;">📋 Quiz Instructions:</h4>
+                <ul style="margin-left: 20px; color: #5f6368;">
+                    <li>10 multiple choice questions</li>
+                    <li>Passing score: 80% (8 out of 10 correct)</li>
+                    <li>You can retake the quiz if needed</li>
+                    <li>Review explanations for each question after submission</li>
+                </ul>
+            </div>
+
+            <button class="btn btn-primary" onclick="startQuiz()" id="startQuizBtn">
+                Begin Quiz →
+            </button>
+        </div>
+    </div>
+
+    <script src="../js/quiz-data.js"></script>
+    <script src="../js/app.js"></script>
+    <script>
+        // Initialize quiz for this module
+        const moduleNumber = 5;
+        let quizModule = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set up module info for quiz
+            quizModule = moduleData[moduleNumber - 1];
+            currentModule = quizModule;
+        });
+
+        function startQuiz() {
+            document.getElementById('startQuizBtn').style.display = 'none';
+            loadQuiz(moduleNumber);
+        }
+    </script>
+</body>
+</html>
