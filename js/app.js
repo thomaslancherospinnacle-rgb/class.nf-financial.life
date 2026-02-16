@@ -89,53 +89,8 @@ const moduleData = [
     }
 ];
 
-// Quiz Data
-const quizData = {
-    1: [
-        {
-            question: "Which of the following is TRUE about certificates of deposit (CDs)?",
-            options: [
-                "They can always be withdrawn instantly without penalty",
-                "They have early withdrawal penalties and may not be instantly accessible",
-                "They are the same as regular checking accounts",
-                "They automatically pay out upon account holder's death"
-            ],
-            correct: 1
-        },
-        {
-            question: "What is the PRIMARY purpose of a 401(k) plan?",
-            options: [
-                "To provide immediate cash after death",
-                "To serve as an emergency fund",
-                "To provide retirement income",
-                "To pay funeral expenses"
-            ],
-            correct: 2
-        }
-    ],
-    2: [
-        {
-            question: "What does 'LIQUID' mean when referring to an asset?",
-            options: [
-                "It's immediately available as cash",
-                "It can be converted to cash",
-                "It's stored in a bank account",
-                "It has no value"
-            ],
-            correct: 1
-        },
-        {
-            question: "How long does it typically take to access 401(k) funds after a death?",
-            options: [
-                "Immediately",
-                "2-6 weeks",
-                "6-12 months",
-                "2-3 years"
-            ],
-            correct: 1
-        }
-    ]
-};
+// Note: Quiz data loaded from quiz-data.js
+// This file contains the quiz UI and logic
 
 // State Management
 let currentModule = null;
@@ -271,14 +226,21 @@ function showNotification(message) {
 let currentQuiz = [];
 let currentQuestion = 0;
 let userAnswers = [];
+let quizStartTime = null;
 
 function loadQuiz(moduleId) {
-    currentQuiz = quizData[moduleId] || [];
+    currentQuiz = allQuizData[moduleId] || [];
     currentQuestion = 0;
     userAnswers = [];
+    quizStartTime = new Date();
     
     if (currentQuiz.length > 0) {
         displayQuestion();
+    } else {
+        const quizContainer = document.querySelector('.quiz-section');
+        if (quizContainer) {
+            quizContainer.innerHTML = '<p>Quiz data not available for this module.</p>';
+        }
     }
 }
 
@@ -287,26 +249,40 @@ function displayQuestion() {
     if (!quizContainer || currentQuestion >= currentQuiz.length) return;
     
     const question = currentQuiz[currentQuestion];
+    const progressPercent = ((currentQuestion) / currentQuiz.length) * 100;
     
     quizContainer.innerHTML = `
+        <div style="margin-bottom: 24px;">
+            <div class="progress-header">
+                <span>Question ${currentQuestion + 1} of ${currentQuiz.length}</span>
+                <span>${Math.round(progressPercent)}% Complete</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" style="width: ${progressPercent}%"></div>
+            </div>
+        </div>
+        
         <div class="quiz-question">
             <div class="question-header">
-                Question ${currentQuestion + 1} of ${currentQuiz.length}: ${question.question}
+                ${question.question}
             </div>
             <ul class="quiz-options">
                 ${question.options.map((option, index) => `
-                    <li class="quiz-option" onclick="selectAnswer(${index})">
-                        ${String.fromCharCode(97 + index)}) ${option}
+                    <li class="quiz-option ${userAnswers[currentQuestion] === index ? 'selected' : ''}" 
+                        onclick="selectAnswer(${index})" 
+                        data-option="${index}">
+                        <strong>${String.fromCharCode(65 + index)}.</strong> ${option}
                     </li>
                 `).join('')}
             </ul>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-top: 24px;">
+        
+        <div style="display: flex; justify-content: space-between; margin-top: 24px; gap: 12px;">
             <button class="btn btn-secondary" onclick="previousQuestion()" ${currentQuestion === 0 ? 'disabled' : ''}>
-                Previous
+                ← Previous
             </button>
-            <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" disabled>
-                ${currentQuestion === currentQuiz.length - 1 ? 'Submit Quiz' : 'Next'}
+            <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" ${userAnswers[currentQuestion] === undefined ? 'disabled' : ''}>
+                ${currentQuestion === currentQuiz.length - 1 ? 'Submit Quiz →' : 'Next →'}
             </button>
         </div>
     `;
@@ -321,10 +297,16 @@ function selectAnswer(index) {
     });
     
     // Enable next button
-    document.getElementById('nextBtn').disabled = false;
+    const nextBtn = document.getElementById('nextBtn');
+    if (nextBtn) nextBtn.disabled = false;
 }
 
 function nextQuestion() {
+    if (userAnswers[currentQuestion] === undefined) {
+        alert('Please select an answer before continuing.');
+        return;
+    }
+    
     if (currentQuestion < currentQuiz.length - 1) {
         currentQuestion++;
         displayQuestion();
@@ -342,26 +324,141 @@ function previousQuestion() {
 
 function submitQuiz() {
     let correct = 0;
+    const results = [];
+    
     currentQuiz.forEach((q, index) => {
-        if (userAnswers[index] === q.correct) correct++;
+        const isCorrect = userAnswers[index] === q.correct;
+        if (isCorrect) correct++;
+        
+        results.push({
+            question: index + 1,
+            userAnswer: userAnswers[index],
+            correctAnswer: q.correct,
+            isCorrect: isCorrect,
+            explanation: q.explanation || ''
+        });
     });
     
     const score = (correct / currentQuiz.length) * 100;
     const passed = score >= 80;
+    const timeSpent = Math.round((new Date() - quizStartTime) / 1000 / 60); // minutes
     
-    quizScores[currentModule.id] = score;
+    // Save quiz score
+    quizScores[currentModule.id] = {
+        score: score,
+        correct: correct,
+        total: currentQuiz.length,
+        passed: passed,
+        date: new Date().toISOString(),
+        timeSpent: timeSpent
+    };
     localStorage.setItem('quizScores', JSON.stringify(quizScores));
     
     if (passed) {
         markModuleComplete(currentModule.id);
     }
     
-    alert(`Quiz ${passed ? 'Passed' : 'Failed'}!\n\nScore: ${score.toFixed(0)}%\nCorrect: ${correct}/${currentQuiz.length}\n\n${passed ? 'Great job! You can proceed to the next module.' : 'Please review the material and try again. You need 80% to pass.'}`);
+    displayQuizResults(score, correct, currentQuiz.length, passed, results, timeSpent);
+}
+
+function displayQuizResults(score, correct, total, passed, results, timeSpent) {
+    const quizContainer = document.querySelector('.quiz-section');
+    if (!quizContainer) return;
     
-    if (passed) {
-        window.location.href = 'index.html';
+    const statusColor = passed ? '#1e8e3e' : '#d93025';
+    const statusBg = passed ? '#e8f5e9' : '#fce8e6';
+    const statusIcon = passed ? '✓' : '✗';
+    
+    quizContainer.innerHTML = `
+        <div style="text-align: center; padding: 32px; background: ${statusBg}; border-radius: 8px; margin-bottom: 24px;">
+            <div style="font-size: 64px; margin-bottom: 16px;">${statusIcon}</div>
+            <h2 style="font-size: 32px; color: ${statusColor}; margin-bottom: 8px;">
+                ${passed ? 'Quiz Passed!' : 'Quiz Not Passed'}
+            </h2>
+            <p style="font-size: 18px; color: #5f6368;">
+                You scored ${score.toFixed(0)}% (${correct} out of ${total} correct)
+            </p>
+            <p style="font-size: 14px; color: #5f6368; margin-top: 8px;">
+                Time spent: ${timeSpent} minute${timeSpent !== 1 ? 's' : ''}
+            </p>
+        </div>
+        
+        <div style="margin-bottom: 24px;">
+            <h3 style="margin-bottom: 16px;">Your Results:</h3>
+            ${results.map((r, index) => `
+                <div style="padding: 16px; margin-bottom: 12px; border-radius: 8px; background: ${r.isCorrect ? '#e8f5e9' : '#fce8e6'}; border-left: 4px solid ${r.isCorrect ? '#1e8e3e' : '#d93025'};">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                        <strong style="color: #202124;">Question ${r.question}</strong>
+                        <span style="color: ${r.isCorrect ? '#1e8e3e' : '#d93025'}; font-weight: 500;">
+                            ${r.isCorrect ? '✓ Correct' : '✗ Incorrect'}
+                        </span>
+                    </div>
+                    <p style="font-size: 14px; color: #5f6368; margin-bottom: 8px;">
+                        ${currentQuiz[index].question}
+                    </p>
+                    ${!r.isCorrect ? `
+                        <p style="font-size: 13px; margin-top: 8px;">
+                            <strong>Your answer:</strong> ${String.fromCharCode(65 + r.userAnswer)}. ${currentQuiz[index].options[r.userAnswer]}<br>
+                            <strong>Correct answer:</strong> ${String.fromCharCode(65 + r.correctAnswer)}. ${currentQuiz[index].options[r.correctAnswer]}
+                        </p>
+                    ` : ''}
+                    ${r.explanation ? `
+                        <p style="font-size: 13px; color: #5f6368; margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.1);">
+                            <strong>Explanation:</strong> ${r.explanation}
+                        </p>
+                    ` : ''}
+                </div>
+            `).join('')}
+        </div>
+        
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            ${passed ? `
+                <button class="btn btn-primary" onclick="window.location.href='../index.html'">
+                    ← Back to Course
+                </button>
+                ${currentModule.id < 7 ? `
+                    <button class="btn btn-primary" onclick="window.location.href='module${currentModule.id + 1}.html'">
+                        Next Module →
+                    </button>
+                ` : `
+                    <button class="btn btn-primary" onclick="showCertificate()">
+                        View Certificate 🎓
+                    </button>
+                `}
+            ` : `
+                <button class="btn btn-secondary" onclick="location.reload()">
+                    Retake Quiz
+                </button>
+                <button class="btn btn-secondary" onclick="window.location.href='../index.html'">
+                    Back to Course
+                </button>
+            `}
+        </div>
+    `;
+    
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
+
+function showCertificate() {
+    const totalModules = 7;
+    const passedModules = Object.values(quizScores).filter(s => s.passed).length;
+    
+    if (passedModules === totalModules) {
+        alert(`🎓 CONGRATULATIONS! 🎓
+
+You have successfully completed all 7 modules and passed all quizzes!
+
+You are now certified in:
+ASSETS, LIQUIDITY & REGULATIONS TRAINING
+
+Certificate features coming soon...
+
+Print this page or take a screenshot for your records.`);
     } else {
-        location.reload();
+        alert(`You've passed ${passedModules} out of ${totalModules} modules.
+
+Complete and pass all 7 module quizzes to earn your certification!`);
     }
 }
 
