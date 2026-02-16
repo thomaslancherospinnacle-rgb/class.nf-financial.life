@@ -8,10 +8,37 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <!-- Auth Protection -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Protect this page - redirect to login if not authenticated
+        (async () => {
+            if (!Auth.isSessionValid()) {
+                console.log('No valid session, redirecting to login');
+                window.location.replace('login.html');
+                return;
+            }
+            
+            try {
+                const isValid = await Auth.validateSession();
+                if (!isValid) {
+                    console.log('Session invalid, redirecting to login');
+                    Auth.clearSession();
+                    window.location.replace('login.html');
+                }
+            } catch (e) {
+                console.error('Session validation error:', e);
+                Auth.clearSession();
+                window.location.replace('login.html');
+            }
+        })();
+    </script>
+    
     <!-- Header -->
     <header class="header">
         <div class="header-left">
-            <a href="index.html" class="logo">
+            <a href="home.html" class="logo">
                 <div class="logo-icon">NF</div>
                 <div class="logo-text">
                     <h1>Non-Forfeiture Financial</h1>
@@ -20,6 +47,7 @@
             </a>
         </div>
         <div class="header-right">
+            <button class="btn btn-secondary" onclick="logout()" style="margin-right: 12px;">Logout</button>
             <button class="btn btn-primary">Dashboard</button>
         </div>
     </header>
@@ -183,5 +211,13 @@
 
     <script src="js/quiz-data.js"></script>
     <script src="js/app.js"></script>
+    <script>
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                Auth.clearSession();
+                window.location.replace('login.html');
+            }
+        }
+    </script>
 </body>
 </html>
