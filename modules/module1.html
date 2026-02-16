@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 1: Understanding Assets Clients Actually Have</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon">NF</div>
+                <div class="logo-text">
+                    <h1>Non-Forfeiture Financial</h1>
+                    <p>Finance 101: Regulations and Codes</p>
+                </div>
+            </a>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-secondary" onclick="window.location.href='../index.html'">← Back to Course</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>›</span>
+            <span>Module 1</span>
+        </div>
+
+        <div class="video-container">
+            <video class="video-player" id="moduleVideo" controls>
+                <source src="../videos/module1video.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            
+            <div class="video-info">
+                <h2 class="video-title">MODULE 1: Understanding Assets Clients Actually Have</h2>
+                <div class="video-meta-bar">
+                    <div class="video-stats">
+                        <span>🎥 12 min</span>
+                        <span>📚 Module 1 of 7</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="markComplete()">Mark as Complete</button>
+                </div>
+                <p class="video-description">Learn about all common client asset types including cash accounts, retirement plans, investments, real estate, business assets, and insurance products.</p>
+            </div>
+        </div>
+
+        <div class="resources-section">
+            <h3>📁 Module Resources</h3>
+            <ul class="resource-list">
+                <li class="resource-item">
+                    <div class="resource-icon">📄</div>
+                    <div class="resource-info">
+                        <h4>Module 1 Study Guide</h4>
+                        <p>PDF • 350 KB</p>
+                    </div>
+                </li>
+                <li class="resource-item">
+                    <div class="resource-icon">📄</div>
+                    <div class="resource-info">
+                        <h4>Reference Materials</h4>
+                        <p>PDF • 280 KB</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="resources-section">
+            <h3>📝 Module 1 Quiz</h3>
+            <p class="video-description" style="margin-bottom: 16px;">
+                Test your knowledge. Score 80% or higher to pass this module.
+            </p>
+            <button class="btn btn-primary" onclick="alert('Quiz functionality coming soon!')">
+                Take Quiz →
+            </button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 32px;">
+            <button class="btn btn-secondary" onclick="window.location.href='module1.html'" disabled>
+                ← Previous
+            </button>
+            <button class="btn btn-primary" onclick="window.location.href='module2.html'" >
+                Next →
+            </button>
+        </div>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadModule(1);
+        });
+        function markComplete() {
+            markModuleComplete(1);
+            showNotification('Module 1 complete! 🎉');
+        }
+    </script>
+</body>
+</html>

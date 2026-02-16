@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Module 3: Tax, Legal & Access Rules</title>
+    <link rel="stylesheet" href="../css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <a href="../index.html" class="logo">
+                <div class="logo-icon">NF</div>
+                <div class="logo-text">
+                    <h1>Non-Forfeiture Financial</h1>
+                    <p>Finance 101: Regulations and Codes</p>
+                </div>
+            </a>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-secondary" onclick="window.location.href='../index.html'">← Back to Course</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="../index.html">Home</a>
+            <span>›</span>
+            <span>Module 3</span>
+        </div>
+
+        <div class="video-container">
+            <video class="video-player" id="moduleVideo" controls>
+                <source src="../videos/module3video.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            
+            <div class="video-info">
+                <h2 class="video-title">MODULE 3: Tax, Legal & Access Rules</h2>
+                <div class="video-meta-bar">
+                    <div class="video-stats">
+                        <span>🎥 15 min</span>
+                        <span>📚 Module 3 of 7</span>
+                    </div>
+                    <button class="btn btn-primary" onclick="markComplete()">Mark as Complete</button>
+                </div>
+                <p class="video-description">Understand what regulations, laws, and procedures govern each asset type. Learn about probate, beneficiary designations, and tax implications.</p>
+            </div>
+        </div>
+
+        <div class="resources-section">
+            <h3>📁 Module Resources</h3>
+            <ul class="resource-list">
+                <li class="resource-item">
+                    <div class="resource-icon">📄</div>
+                    <div class="resource-info">
+                        <h4>Module 3 Study Guide</h4>
+                        <p>PDF • 350 KB</p>
+                    </div>
+                </li>
+                <li class="resource-item">
+                    <div class="resource-icon">📄</div>
+                    <div class="resource-info">
+                        <h4>Reference Materials</h4>
+                        <p>PDF • 280 KB</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="resources-section">
+            <h3>📝 Module 3 Quiz</h3>
+            <p class="video-description" style="margin-bottom: 16px;">
+                Test your knowledge. Score 80% or higher to pass this module.
+            </p>
+            <button class="btn btn-primary" onclick="alert('Quiz functionality coming soon!')">
+                Take Quiz →
+            </button>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 32px;">
+            <button class="btn btn-secondary" onclick="window.location.href='module2.html'" >
+                ← Previous
+            </button>
+            <button class="btn btn-primary" onclick="window.location.href='module4.html'" >
+                Next →
+            </button>
+        </div>
+    </div>
+
+    <script src="../js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadModule(3);
+        });
+        function markComplete() {
+            markModuleComplete(3);
+            showNotification('Module 3 complete! 🎉');
+        }
+    </script>
+</body>
+</html>
